@@ -26,16 +26,16 @@ warp v0.2024.09.03.08.02.stable_03
 
 ## 設定方法
 1. キーボードショートカットで、hotkeyとして設定したキーを設定
-![](/images/8edf1e7afed931/1.png)
+![](/images/8edf1e7afed931/image1.png)
 :::message
 私は｢option + Space｣で設定しています。
 :::
 
 2. アクション設定の1つ目で入力ソース｢ABC｣を選択
-![](/images/8edf1e7afed931/2.png)
+![](/images/8edf1e7afed931/image2.png)
 
 3. アクション設定の2つ目で改めてhotkeyとして設定したキーを設定
-![](/images/8edf1e7afed931/3.png)
+![](/images/8edf1e7afed931/image3.png)
 
 
 :::message
