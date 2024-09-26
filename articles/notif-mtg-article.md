@@ -2,7 +2,7 @@
 title: "脱MTG忘れ ~Google APIとSlackWebhookで自動リマインダーを構築してみた~"
 emoji: "🐡"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: [OAuth, GoogleAPI, Slack, SlackWebHook, shell script]
+topics: [OAuth, GoogleAPI, Slack, SlackWebHook, ShellScript]
 published: false
 ---
 
