@@ -2,17 +2,20 @@
 title: "脱MTG忘れ ~Google APIとSlackWebhookで自動リマインダーを構築してみた~"
 emoji: "🐡"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: [OAuth, GoogleAPI, Slack, SlackWebHook, ShellScript]
+topics: [OAuth, GoogleAPI, Slack, SlackWebHook, shell script]
 published: false
 ---
 
 ## はじめに
 
-毎朝仕事の始まりは、その日のスケジュールを確認して、MTG 開始時刻の数分前にアラームをかける作業を行っていました。
+毎朝仕事の始まりは、その日のスケジュールを確認して、MTG 開始時刻の数分前にアラームをかける作業を行っている方は多いと思います。
 
-とくに大変な作業でも無いので、毎朝続けてきましたが、アラームのかけ忘れや、頭のどこかでスケジュール忘れないかと心配な状態から開放される為に、`当日のスケジュール確認`と`開始2分前のリマインド`を自動化してみました。
+特別大変な作業でもないので、私も毎朝続けてきましたが、頭のどこかで`アラームのかけ忘れはないか？` `MTGまであと何分だ？`と心配事を常に**ぼんやり**抱えている状態でした。
 
-github で公開しているので、よければご利用ください。
+今回は、そんな心配事を取り除き作業に集中できる環境を作る為に、`当日のスケジュール確認`と`開始2分前のリマインド`を自動化してみました。
+もし、同じ様な思いがある方は、初期設定だけちょっと大変ですが、ぜひ実施してみてください。
+
+<!-- github で公開しているので、よければご利用ください。
 https://github.com/naoki0803/NotifMTG
 
 :::message
@@ -21,16 +24,16 @@ https://github.com/naoki0803/NotifMTG
 これ、MTG の通知も Lambda で出来るんじゃ？
 あれ、Lambda だと多少お金かかるから Mac だけでできそうじゃない？
 
-という具合で作成したので、github には serverless.yml のファイルがあったりします。
+という具合で作成したので、github には serverless.yml のファイルがあります。
 :::
-https://www.udemy.com/course/aws-lambda-serverless-framework/?couponCode=ST11MT91624A
+https://www.udemy.com/course/aws-lambda-serverless-framework/?couponCode=ST11MT91624A -->
 
 ## 利用している技術
 
 -   GoogleCalendarAPI
 -   OAuth2.0
 -   SlackWebhook
--   ShellScript
+-   shell script
 -   Node.js
 -   cron
 
@@ -43,13 +46,17 @@ https://www.udemy.com/course/aws-lambda-serverless-framework/?couponCode=ST11MT9
 1.  朝一、当日のスケジュール一覧通知
 2.  MTG 開始 2 分前のリマインド通知
 
-また、プログラムの実行は cron を利用して、ShellScript から自動的に実行しているので、作業漏れが発生しません。
+また、プログラムの実行は cron を利用して、shell script から自動的に実行しているので、作業漏れが発生しません。
 
-### このプログラムで出来ないこと
+### このプログラムで出来ないこと(注意点)
 
 現状では、以下に該当した場合リマインドの通知がされません。
-- PC 再起動後すべてのリマインド通知
-- cronで./script.sh を実行した時間以降に`追加登録されたスケジュール`のリマインド通知
+
+-   PC 再起動後すべてのリマインド通知
+-   cron で./script.sh を実行した時間以降に`追加登録されたスケジュール`のリマインド通知
+
+また、利用は Mac を想定しており、Windows では cron の設定ができないので、本記事をそのままでは実行出来ません。
+タスクスケジューラーなどで同じことが実現できると思いますが、未検証です。
 
 ## フォルダ構成と機能説明
 
@@ -79,7 +86,7 @@ OAuth2.0 を使用して Google Calendar API にアクセスするための認�
 保存された認証情報(token.json)を読み込み、必要に応じて credentials.json の値を利用して、新しい認証情報を取得し token.json として保存します。
 
 :::message
-gitclone をした時点では、`token.json`は作成されていませんが、プログラムを初回起動した際に Google アカウントにログインして、OAuth 認証が完了すると、自動的に`token.json`が作成されます。
+git clone をした時点では、`token.json`は作成されていませんが、プログラムを初回起動した際に Google アカウントにログインして、OAuth 認証が完了すると、自動的に`token.json`が作成されます。
 :::
 
 :::message
@@ -299,13 +306,11 @@ toDayMtgNotif();
 ### 🤖 自動実行機能 (script.sh)
 
 crontab で登録した実行日時に、src/mtgNotif.js を実行する為のスクリプトです。
-Slackの起動もこのスクリプトの中で実行しています。
+Slack の起動もこのスクリプトの中で実行しています。
 
 :::message
-
-#### 平日 8:45 に実行する場合の crontab のサンプル
-
-`45 8 * * 1-5 /bin/zsh -c 'source ~/projects/NotifMTG/script.sh' >> ~/projects/NotifMTG/logs/cron.log 2>&1`
+このスクリプトを手動実行する事で、再起動後や、追加された MTG のリマインド通知を実行する事ができます。
+※再起動後や、スケジュールが追加された場合は、ターミナルでプロジェクトに移動して`./script.sh`を実行してください。
 :::
 
 ```sh:script.sh
@@ -331,52 +336,69 @@ cd ~/projects/NotifMTG
 /opt/homebrew/bin/node ~/projects/NotifMTG/src/mtgNotif.js &
 ```
 
+#### cron の設定
+
+平日 8:45 に実行する場合の crontab のサンプル
+
+```cron:crontab -l
+45 8 * * 1-5 /bin/zsh -c 'source ~/projects/NotifMTG/script.sh' >> ~/projects/NotifMTG/logs/cron.log 2>&1
+```
+
 ## 利用前の環境設定
 
 事前に以下作業を実施する必要があります。
 
-1. gitcloneとnpm install
+1. git clone と npm install
 2. Google API の利用準備
 3. Google Calendar の ID を確認
 4. SlackWebhookURL の取得
 5. cron の設定
 
+### 1. git clone と npm install
 
-### 1. gitcloneとnpm install
-Terminalで任意のディレクトリに移動して以下コマンドを一行ずつ実行
+Terminal で任意のディレクトリに移動して以下コマンドを一行ずつ実行
+
 ```
 git clone https://github.com/naoki0803/NotifMTG.git
 npm install
 ```
 
+:::message
+git？npm？それ美味しいの？という方は以下を実施してください。
+
+1. nodejs をインストール
+   https://qiita.com/sefoo0104/items/0653c935ea4a4db9dc2b
+
+2. 以下 URL にアクセスして、緑色の`<> Code ▼`をクリックして`Downloads ZIP`をクリックしてください。
+   https://github.com/naoki0803/NotifMTG.git
+   ![image](/images/notif-mtg-article/Slack_12.png =500x)
+
+:::
+
 ### 2. Google API の利用準備
 
 https://zenn.dev/yusuke49/articles/6c147bd6308912
-こちらの記事の内容をすべて実施いただき、最終的にJSONファイルをダウンロードします。
-ダウンロードしたjson ファイルの名前を、`credentials.json`に変更して、congigフォルダ内に保存します。
-
-![image](/images/notif-mtg-article/Slack_10.png =500x)
+こちらの記事の内容をすべて実施いただき、最終的に JSON ファイルをダウンロードします。
+ダウンロードした json ファイルの名前を、`credentials.json`に変更して、config フォルダ内に保存します。
 
 :::message alert
-2点だけ記事と異なる部分があります。
-#### 1点目: OauthClientのスコープ
+2 点だけ記事と異なる部分がありますので、以下も合わせてご確認ください。
+
+#### 1 点目: OauthClient のスコープ
+
+記事内の`3. OAuth同意を構成`の手順の手順 5 の画面で、スコープを選択しますが、
+今回のプログラムの場合`auth/calendar.readonly`だけ選択いただければ動きます。
 ![image](/images/notif-mtg-article/Slack_9.png =500x)
 
-記事内の`3. OAuth同意を構成`の手順の手順5の画面で、スコープを選択しますが、
-今回のプログラムの場合`auth/calendar.readonly`だけ選択いただければ動きます。
+#### 2 点目: 承認済みリダイレクト URI の記述
 
-#### 2点目: OauthClientのスコープ
+記事内の`4. アクセス認証情報を作成`の手順 3 の画面にある
+承認済みのリダイレクト URI に`http://localhost:3000/callback`と入力して作成をクリックしてください。
 ![image](/images/notif-mtg-article/Slack_11.png =500x)
-記事内の`4. アクセス認証情報を作成`の手順3の画面にある
-承認済みのリダイレクトURIに`http://localhost:3000/callback`と入力して作成をクリックしてください
-:::
 
+#### JSON ファイルのダウンロードと保存
 
-
-
-
-
-
+上記画像の作成を押すと json のダウンロードが出来ますので、ファイルの名前を、`credentials.json`に変更して、config フォルダ内に保存します。
 
 ```
 app
@@ -388,14 +410,28 @@ app
     └── mtgNotif.js
 ```
 
+![image](/images/notif-mtg-article/Slack_10.png =300x)
+
+:::
+
 ### 3. Google Calendar の ID 確認
 
 https://qiita.com/mikeneko_t98/items/60e264941492d0b44fe5
 
-MTG のスケジュールなどを入力している Google カレンダーの ID を確認して、`.env`ファイルに入力します。
+1. MTG のスケジュールなどを入力している Google Calendar の ID を確認して、`.env`ファイルに入力します。
+
+```env:.env
+CALENDAR_ID=カレンダーIDを入力する
+```
 
 ```
-CALENDAR_ID=カレンダーIDを入力する
+app
+├── .env
+├── config
+│   └── credentials.json
+└── src
+    ├── googleAuth.js
+    └── mtgNotif.js
 ```
 
 ### 4. SlackWebhookURL の取得
@@ -428,23 +464,64 @@ CALENDAR_ID=カレンダーIDを入力する
 8. 作成された Webhook URL を`.env`ファイルに入力します。
    ![image](/images/notif-mtg-article/Slack_8.png =500x)
 
-```
+```env:.env
 SLACK_WEBHOOK_URL=Webhook URLを入力する
+```
+
+```
+app
+├── .env
+├── config
+│   └── credentials.json
+└── src
+    ├── googleAuth.js
+    └── mtgNotif.js
 ```
 
 ### 5. cron の設定
 
-Terminal で`crontab -e`を実行して以下cronを登録
+1.Terminal で`crontab -e`を実行して以下 cron を登録
 
 ```cron
 45 8 * * 1-5 /bin/zsh -c 'source ~<ご自身のprojectPath>/NotifMTG/script.sh' >> ~/<ご自身のprojectPath>/NotifMTG/logs/cron.log 2>&1
 ```
+
 :::message
-上記は平日8:45に通知する場合のcronです。
+上記は平日 8:45 に通知する場合の cron です。
 :::
 
+### 6. 初回起動と認証
+
+1. ターミナルで`node src/mtgNotif.js`を実行します。
+
+2. ブラウザが開き、Google アカウントのログイン画面が表示されますので、ログインして、アプリのアクセスを許可してください。
+3. 認証が成功したら、ターミナルに`Authorization complete`と表示され、Slack に本日の MTG の通知が来ます。
+
+:::message
+プログラムに Google Calendar の API を利用する権限を許可する作業なので初回のみ表示されます。
+
+また、認証が完了すると`config`フォルダ内に`token.json`が保存されます。
+
+```
+app
+├── .env
+├── config
+│   └── credentials.json
+│   └── token.json
+└── src
+    ├── googleAuth.js
+    └── mtgNotif.js
+```
+
+:::
 
 ## まとめ
-実際に利用して、毎朝当日のMTG
 
-## 参考文献
+実際に利用してみて、私にはもう`なくてはならない物`になっています。
+朝一の手動アラーム設定作業と、どこかでスケジュールのことを気にかけて、うすーく頭のリソースを使っている状態から開放されました。
+作業に集中できますし、自動化したことによってアラームのかけ忘れも発生しないので本当に快適です。
+
+初期設定は色々と大変ですが、やってみる価値はあると思いますのでぜひ。
+再起動後の自動実行や、追加登録されたスケジュールの通知も順次対応しようと思います.
+
+また、内容に不備があれば、忌憚のないご意見をお願いします。
