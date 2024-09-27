@@ -13,29 +13,12 @@ published: false
 特別大変な作業でもないので、私も毎朝続けてきましたが、頭のどこかで`アラームのかけ忘れはないか？` `MTGまであと何分だ？`と心配事を常に**ぼんやり**抱えている状態でした。
 
 今回は、そんな心配事を取り除き作業に集中できる環境を作る為に、`当日のスケジュール確認`と`開始2分前のリマインド`を自動化してみました。
-もし、同じ様な思いがある方は、初期設定だけちょっと大変ですが、ぜひ実施してみてください。
+もし、同じ様な思いをしている方は、初期設定だけちょっと大変ですが、ぜひ実施してみてください。
 
-<!-- github で公開しているので、よければご利用ください。
+github で公開しているので、よければご利用ください。
 https://github.com/naoki0803/NotifMTG
 
-:::message
-もともと、Udemy のコースで ServerLessFramework の勉強で、Lambda で AWS の料金を毎朝通知するプログラムをハンズオンで実装したのですが、
 
-これ、MTG の通知も Lambda で出来るんじゃ？
-あれ、Lambda だと多少お金かかるから Mac だけでできそうじゃない？
-
-という具合で作成したので、github には serverless.yml のファイルがあります。
-:::
-https://www.udemy.com/course/aws-lambda-serverless-framework/?couponCode=ST11MT91624A -->
-
-## 利用している技術
-
--   GoogleCalendarAPI
--   OAuth2.0
--   SlackWebhook
--   shell script
--   Node.js
--   cron
 
 ## プログラムの全体像
 
@@ -44,7 +27,10 @@ https://www.udemy.com/course/aws-lambda-serverless-framework/?couponCode=ST11MT9
 このプログラムは、OAuth2.0 を用いて Google Calendar API にアクセスし、登録されたミーティングの予定を取得して、以下の内容を Slack に通知します。
 
 1.  朝一、当日のスケジュール一覧通知
+![image](/images/notif-mtg-article/image_1.png)
+
 2.  MTG 開始 2 分前のリマインド通知
+![image](/images/notif-mtg-article/image_2.png)
 
 また、プログラムの実行は cron を利用して、shell script から自動的に実行しているので、作業漏れが発生しません。
 
@@ -55,8 +41,18 @@ https://www.udemy.com/course/aws-lambda-serverless-framework/?couponCode=ST11MT9
 -   PC 再起動後すべてのリマインド通知
 -   cron で./script.sh を実行した時間以降に`追加登録されたスケジュール`のリマインド通知
 
-また、利用は Mac を想定しており、Windows では cron の設定ができないので、本記事をそのままでは実行出来ません。
+:::message alert 
+利用は Mac を想定しており、Windows では cron の設定ができないので、本記事をそのままでは実行出来ません。
 タスクスケジューラーなどで同じことが実現できると思いますが、未検証です。
+:::
+### 利用している技術
+
+-   GoogleCalendarAPI
+-   OAuth2.0
+-   SlackWebhook
+-   shell script
+-   Node.js
+-   cron
 
 ## フォルダ構成と機能説明
 
@@ -381,25 +377,30 @@ https://zenn.dev/yusuke49/articles/6c147bd6308912
 こちらの記事の内容をすべて実施いただき、最終的に JSON ファイルをダウンロードします。
 ダウンロードした json ファイルの名前を、`credentials.json`に変更して、config フォルダ内に保存します。
 
-:::message alert
-2 点だけ記事と異なる部分がありますので、以下も合わせてご確認ください。
+:::message
+3 点記事と異なる部分がありますので、以下も合わせてご確認ください。
+:::
 
-#### 1 点目: OauthClient のスコープ
+#### 1. OauthClient のスコープ
 
 記事内の`3. OAuth同意を構成`の手順の手順 5 の画面で、スコープを選択しますが、
 今回のプログラムの場合`auth/calendar.readonly`だけ選択いただければ動きます。
 ![image](/images/notif-mtg-article/Slack_9.png =500x)
 
-#### 2 点目: 承認済みリダイレクト URI の記述
+#### 2. 承認済みリダイレクト URI の記述
 
 記事内の`4. アクセス認証情報を作成`の手順 3 の画面にある
 承認済みのリダイレクト URI に`http://localhost:3000/callback`と入力して作成をクリックしてください。
 ![image](/images/notif-mtg-article/Slack_11.png =500x)
 
-#### JSON ファイルのダウンロードと保存
+#### 3. JSON ファイルのダウンロードと保存
 
 上記画像の作成を押すと json のダウンロードが出来ますので、ファイルの名前を、`credentials.json`に変更して、config フォルダ内に保存します。
 
+:::message alert
+`credentials.json`には機密情報が含まれます。
+ファイルの内容が第三者に漏洩しないように、取り扱いにはご注意ください。
+:::
 ```
 app
 ├── .env
@@ -412,7 +413,7 @@ app
 
 ![image](/images/notif-mtg-article/Slack_10.png =300x)
 
-:::
+
 
 ### 3. Google Calendar の ID 確認
 
@@ -501,6 +502,9 @@ app
 プログラムに Google Calendar の API を利用する権限を許可する作業なので初回のみ表示されます。
 
 また、認証が完了すると`config`フォルダ内に`token.json`が保存されます。
+:::message alert
+`token.json`には機密情報が含まれます。
+ファイルの内容が第三者に漏洩しないように、取り扱いにはご注意ください。
 
 ```
 app
@@ -512,14 +516,12 @@ app
     ├── googleAuth.js
     └── mtgNotif.js
 ```
-
 :::
 
-## まとめ
+## 最後に
 
 実際に利用してみて、私にはもう`なくてはならない物`になっています。
-朝一の手動アラーム設定作業と、どこかでスケジュールのことを気にかけて、うすーく頭のリソースを使っている状態から開放されました。
-作業に集中できますし、自動化したことによってアラームのかけ忘れも発生しないので本当に快適です。
+朝一に実施していた手作業のアラーム設定作業と、どこかでスケジュールのことを気にかけて、ぼんやりと頭のリソースを使っている状態から開放され、作業に集中する事ができるようになりました。
 
 初期設定は色々と大変ですが、やってみる価値はあると思いますのでぜひ。
 再起動後の自動実行や、追加登録されたスケジュールの通知も順次対応しようと思います.
