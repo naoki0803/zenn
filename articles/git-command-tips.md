@@ -120,3 +120,44 @@ git stash save
 :::message
 branch を切り替え前に作業をしてしまった場合などは`git stash` で一時退避した後に、任意の branch に切り替えてから`git stash apply`を実行します。
 :::
+
+# git checkout
+
+## 直前のブランチに移動する
+
+1. -（ハイフン）を指定することで、直前にチェックアウトしていたブランチに移動できます。
+
+コマンド例: `git checkout -`
+
+現在のブランチを確認
+
+```
+$ git branch --show-current
+develop
+```
+
+ブランチを feature/hoge に切替
+
+```
+$ git checkout feature/hoge
+```
+
+現在のブランチを確認
+
+```
+$ git branch --show-current
+feature/hoge
+```
+
+ハイフンを指定して、一つ前のブランチに切替
+
+```
+$ git checkout -
+```
+
+現在のブランチを確認
+
+```
+$ git branch --show-current
+develop
+```
