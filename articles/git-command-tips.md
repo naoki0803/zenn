@@ -1,7 +1,7 @@
 ---
-title: 'git便利コマンド集'
-emoji: '🎃'
-type: 'tech' # tech: 技術記事 / idea: アイデア
+title: "git便利コマンド集"
+emoji: "🎃"
+type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [git, tips]
 published: true
 ---
@@ -161,3 +161,20 @@ $ git checkout -
 $ git branch --show-current
 develop
 ```
+
+# gh
+
+## cli でリモートリポジトリを作成する方法
+
+```
+$ gh repo create --public --source=.
+```
+
+:::message
+private で作成する場合は
+
+```
+$ gh repo create --private --source=.
+```
+
+:::
