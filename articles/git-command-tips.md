@@ -88,6 +88,23 @@ git rebase --continue
 また、過去の編集前の履歴は残ら無い点にも十分注意してください。
 :::
 
+# git rm
+
+## .gitignore に記述する前に、不要なファイルを push してしまった場合の対処方法
+
+1. .gitignore に不要なファイルやフォルダを記述する
+2. git rm -r --cached . を実行し、再度 add と commit を実施する
+
+```
+git rm -r --cached .
+git add .
+git commit -m "既に追跡されている無視対象ファイルを削除"
+```
+
+::: message
+この方法は履歴は残るので、セキュアな情報を push している場合は効果が無い
+:::
+
 # git stash
 
 ## 作業内容をスタッシュに一時避難する
