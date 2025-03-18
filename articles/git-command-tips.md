@@ -138,6 +138,26 @@ git stash save
 branch を切り替え前に作業をしてしまった場合などは`git stash` で一時退避した後に、任意の branch に切り替えてから`git stash apply`を実行します。
 :::
 
+:::message
+apply はスタックとして残り続ける為、保存する 必要がなければ、 `pop` を利用する
+
+```
+git stash pop
+```
+
+:::
+
+## 新規作成した未追跡ファイルを stash する
+
+1. 以下いずれかのコマンド（同じ意味）を実行する
+
+```
+git stash -u
+git stash --include-untracked
+```
+
+2. 任意の場所に stash を pop する
+
 # git checkout
 
 ## 直前のブランチに移動する
