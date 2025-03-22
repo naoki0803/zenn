@@ -3,7 +3,7 @@ title: "Mac && Cursor で C# の環境構築をしてみた"
 emoji: "🐷"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [csharp, 環境構築, mac, cursor]
-published: false
+published: true
 ---
 
 ## 背景
