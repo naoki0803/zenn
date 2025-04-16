@@ -1,62 +1,57 @@
 ---
-title: "CursorのAuto-Completionをショートカットキーでトグルする方法"
+title: "Cursor Tab 機能をショートカットキーでトグルする方法"
 emoji: "💭"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: []
+topics: [cursor, shortcut, cursortab]
 published: false
 ---
 
-## 背景
-
-Cursor を使用していると、Tab 機能（コード補完時のタブ選択機能）のオン/オフを切替たくなることがあります。
-
-![](/images/cursor-tab-toggle-shortcutkey/1.png)
-
-以下記事で`disable cursor tab` or `Enable cursor tab` を実行することで、
-オン/オフできることを紹介していただいていたので、しばらく実施していました。
-https://zenn.dev/take_tech/articles/77383d811797cc
-
-1 つのショートカットを設定することで、on/off をトグルする事ができたので、
-
 ## この記事でできること
 
--   Cursor IDE の Tab 機能を 1 つのショートカットキーでオン/オフできるようになります
--   キーボードショートカットの効率的な設定方法を学べます
--   作業効率を向上させることができます
+-   Cursor の有料機能「Cursor Tab」を 1 つのショートカットキーでオン/オフできるようになります
+
+## 背景
+
+Cursor に課金すると利用可能な Cursor Tab 機能はとても便利な反面、言語キャッチアップのために、自分でコードを書いて身体で覚えたい時などは、機能をオフにして、適切なタイミングで機能を切り替えたくなることがあります。
+
+以下の記事で`disable cursor tab` または `Enable cursor tab` コマンドを実行することで、オン/オフできることを紹介していただいていたので、しばらくこの方法を使っていました。
+https://zenn.dev/take_tech/articles/77383d811797cc
+
+しかし、毎回コマンドを入力するのは少し手間がかかります。
+そこで、1 つのショートカットキーで簡単にトグルできる方法を見つけたので共有します。
+
+:::message
+↓ Cursor Tab はこれです。
+![](/images/cursor-tab-toggle-shortcutkey/1.png =900x)
+Cursor の有料機能の一つで、コードを書く際にタブキーを押すと AI が提案するコード補完を受け入れることができる機能です。
+
+-   [Cursor 公式ドキュメント - Cursor Tab 機能](https://docs.cursor.com/tab)
+
+:::
 
 ## 設定方法
 
 ### 1. キーボードショートカットの設定画面を開く
 
-1. Cursor の設定を開きます（`⌘ + ,`）
-2. 左側のサイドバーから「Keyboard Shortcuts」を選択します
+1. `⌘ + Shift + P` を押してコマンドパレットを開く
+2. `Keyboard Shortcuts` を選択
 
-### 2. 対象のコマンドを検索
+### 2. ショートカットキーの設定
 
-1. 検索バーに「cursor tab」と入力します
-2. 以下の 2 つのコマンドが表示されます：
-    - `Enable Cursor Tab`
-    - `Disable Cursor Tab`
+1. 検索バーに「Toggle Cursor Tab 」と入力します
+2. ショートカットキーを設定します
 
-### 3. ショートカットキーの設定
+    ![](/images/cursor-tab-toggle-shortcutkey/2.png =900x)
+    例：`ctrl + ⌘ + T`
 
-1. 両方のコマンドに同じキーバインドを設定します
-2. 例：`⌘ + Shift + T`
-    - この組み合わせは一例です。任意のキーバインドに変更可能です
-    - 他のショートカットキーと重複しないように注意してください
-
-### 4. 動作確認
+### 3. 動作確認
 
 1. 設定したショートカットキーを押して、Tab 機能がオンになることを確認
-2. 再度同じショートカットキーを押して、Tab 機能がオフになることを確認
+
+    ステータスバーの表示が、on/off で切り替わります。
+    ![](/images/cursor-tab-toggle-shortcutkey/3.png =500x)
+    ![](/images/cursor-tab-toggle-shortcutkey/4.png =500x)
 
 ## まとめ
 
--   1 つのショートカットキーで Tab 機能をトグルできるようになり、作業効率が向上します
--   この設定方法は、他の機能でも応用可能です
--   Cursor の設定をカスタマイズすることで、より快適な開発環境を構築できます
-
-## 補足
-
--   この設定は Cursor の設定ファイルに保存され、アプリケーションを再起動しても維持されます
--   MacOS 版での説明ですが、Windows/Linux でも同様の設定が可能です（ショートカットキーの`⌘`は`Ctrl`に読み替えてください）
+地味ですが、個人的にはとても便利です。
