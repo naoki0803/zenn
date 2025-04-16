@@ -156,7 +156,41 @@ git stash -u
 git stash --include-untracked
 ```
 
-2. 任意の場所に stash を pop する
+2. 任意の場所で stash を pop する
+
+## 保存されている stash の参照
+
+```
+$ git status list
+stash@{0}: WIP on feature/section7-class-object: b925ce9 :sparkles: アクセス修飾子
+stash@{1}: WIP on main: cb02a63 :rocket: dotnet watch run によるビルド結果
+```
+
+## stash の差分確認
+
+```
+$ git diff stash@{1}
+```
+
+## stash の削除
+
+1. 最新の stash 1 件のみ削除
+
+```
+$ git stash drop
+```
+
+2. 任意の stash 削除
+
+```
+$ git stash drop stash@{1}
+```
+
+3. 全ての stash 削除
+
+```
+$ git stash drop clear
+```
 
 # git checkout
 
