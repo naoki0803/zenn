@@ -3,7 +3,7 @@ title: "Cursorで作るDDD Todo アプリ：AIとの対話で深めるドメイ�
 emoji: "🌊"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [csharp, DDD, cursor]
-published: false
+published: true
 ---
 
 ## 背景
