@@ -1,5 +1,5 @@
 ---
-title: "DDD 理解の旅 1 回目(？): DDD を用いて作成した Todo アプリの作成"
+title: "Cursorで作るDDD Todo アプリ：AIとの対話で深めるドメイン駆動設計の理解"
 emoji: "🌊"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [csharp, DDD, cursor]
@@ -8,31 +8,38 @@ published: false
 
 ## 背景
 
-「DDD って難しそう...」と思いながら C#での学習を始めました。本を読むだけでは全体像がつかみにくかったので、思い切って Cursor の AI 機能と一緒に Todo アプリを作ってみることに。
+C# で DDD の勉強を始めました。
 
-![こんなアプリができました](/images/csharp-ddd-todo-app/Gyazo.gif)
+[ドメイン駆動設計入門 ボトムアップでわかる! ドメイン駆動設計の基本](https://www.amazon.co.jp/%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3%E9%A7%86%E5%8B%95%E8%A8%AD%E8%A8%88%E5%85%A5%E9%96%80-%E3%83%9C%E3%83%88%E3%83%A0%E3%82%A2%E3%83%83%E3%83%97%E3%81%A7%E3%82%8F%E3%81%8B%E3%82%8B-%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3%E9%A7%86%E5%8B%95%E8%A8%AD%E8%A8%88%E3%81%AE%E5%9F%BA%E6%9C%AC-%E6%88%90%E7%80%AC-%E5%85%81%E5%AE%A3/dp/479815072X)を半分程度読んだ程度ですが、実際のコードベースでも、内容を振り返り`理解を深めたい`と思うようになりました。
 
-まだ「ただ作っただけ」の状態ですが、この先は AI に「このコードのどこが DDD なの？」「この実装は正しいの？」といった質問をしながら理解を深めていく予定です。質問と回答を README に追加していくことで、コードベースで DDD を学ぶ記録にしていきます。
+そこで、Cursor の Agent 機能を活用して DDD の観点で Todo アプリを作成しました。
+このアプリを「学習教材」として、「どのファイルがどの DDD 概念を表現しているのか」「データはどのように各層を通過するのか」といった具体的な質問を AI に投げかけながら、DDD の理解を深めていきました。
 
-私自身は[ドメイン駆動設計入門(成瀬允宣著)](https://amazon.asia/d/4YRuZzO)を 1/4 ほど読んだ程度。これから本を読み進めながら記事も更新していく予定です。
+本記事では、実際に作成した Todo アプリの作成過程(プロンプト)と、DDD に関する質問・回答を共有します。
+DDD を学んでいる方、特に「実際のコードベースでどう表現されるかを見てみたい」と思っている方の参考になれば幸いです。
 
-## 環境
+::: message
+現在も学習途中のため、本を読み進めながら新たな疑問点を作成したアプリを元に質問し、その内容を適宜追記していく予定です。DDD の理解の旅にぜひお付き合いください。
+:::
 
--   Cursor 0.47.8 Pro(月額$20)
--   .Net 9.0.201
--   TypeScript
--   React
--   shadcn
--   Supabase
+## STEP1: AI を活用して TODO アプリを作成する
 
-## 第一段階: DDD の観点で TODO アプリを作成する
+Cursor の Agent 機能を活用して、DDD の観点で TODO アプリを作成しました。
 
-DDD の理解を深める段階ではありませんが、
+### 実際に作成したプロンプト
 
-### 1. Cursor の Agent 機能に以下プロンプトでアプリを作成
+:::details プロンプト
 
 ```md
-todo アプリを作成したいです。
+# 実施してほしいこと
+
+ドメイン駆動設計(DDD)の観点で、todo アプリを作成してください。
+
+# 目的と背景
+
+-   DDD の勉強を始めたのですが実際に DDD の観点で Web アプリを作成し、出来上がったものを確認して理解を深めたいと考えています。
+-   私は csharp や ts 初学者で、基本構文などを勉強してきました。(spabase は未経験)
+-   作成したソースコードには適宜コメントを入れていただき、初学者が見たときにわかりやすいようにしてください。
 
 # 技術スタック
 
@@ -57,150 +64,79 @@ todo アプリを作成したいです。
 # 作成 Directory
 
 現在、~/project/csharp-todo-app という Directory がワークフォルダになっています。ここにプロジェクトを作成してください。
-
-# 目的と追加で実施してほしいこと
-
--   私は csharp や ts 初学者で(spabase は未経験)、基本構文などは勉強したので、実際に Web アプリを作成し、出来上がったものを確認して理解を深めたいと考えています。
--   作成したソースコードには適宜コメントを入れていただき、初学者が見たときにわかりやすいようにしてください。
 ```
 
-### 2. supabase のデータベースを作成
+:::
+::: message
+プロンプトを投げて`はい完成`とはならず、DB 作成や、バグ修正を AI に確認しながら作成を進めました。
+現状ではまだ多くのバグが残っており、CRUD の CR だけ動く状態です。
+:::
 
-DB 作成方法も AI で以下のような指示がありました。
+### 作成された Todo アプリ
 
-````md
-1. Supabase アカウント登録:
+![こんなアプリができました](/images/csharp-ddd-todo-app/Gyazo.gif)
 
--   [Supabase 公式サイト](https://supabase.com)でアカウントを作成
--   新規プロジェクト作成
--   プロジェクト URL、API Key（anon key）をメモしておく
-
-2. Supabase 接続情報を設定:
-
--   `backend/appsettings.Development.local.json`ファイルを作成（gitignore に含めること）
-
-```json
-{
-    "Supabase": {
-        "Url": "your_supabase_url_here",
-        "Key": "your_supabase_anon_key_here"
-    }
-}
-```
-
-3. Supabase データベースの設定:
-
--   テーブルエディタで`todos`テーブルを以下のスキーマで作成：
-    -   `id`: uuid 型、PRIMARY KEY、デフォルト値: `gen_random_uuid()`
-    -   `title`: text 型、NOT NULL
-    -   `is_completed`: boolean 型、デフォルト値: false
-    -   `created_at`: timestamptz 型、デフォルト値: `now()`
-    -   `user_id`: uuid 型（NULL 許容、外部キー、認証機能を実装する場合）
-````
-
-### 3. バグの処理
-
--   AI で作成した Todo アプリを実際に動かすと色々と以下のようなバグが発生したので、自分でも調べつつ、Cursor の Agent 機能で修正しました。
-    -   CORS の設定
-    -   必要なモジュールのインストール
-    -   Supabase の権限設定
-    -   Todo の ID (uuid) に関して、Csharp と supabase で重複作成している
-    -   Todo の CRUD 処理(一部のみ修正)
-
-### 4. git 管理
-
--   git hub に上げる前に、.gitignore や、supabase の API キーなどを appsettings.Development.local.json に移すなどの設定を行いました。
-
-### 5. README のブラッシュアップ
-
-DDD の観点で以下のような質問を実施して、回答を README に追加していきました。
-Todo アプリを作成した時点で README も作成されており、ある程度の内容は既に盛り込まれている状態の為、自分が確認したい内容を適宜追加していくイメージです。
-
--   DDD の観点で、どのようにアプリが実装されたか
--   CRUD の処理別に、DDD の観点でデータフロー図を作成してください
-
-## 第一段階の実装結果
-
-### プログラムソース
-
+詳細は、以下 GitHub リポジトリの README を参照してください。
 https://github.com/naoki0803/csharp-todo-app
 
-:::details README の内容
+#### 環境
 
-# CSharp Todo アプリケーション
-
-C#と React を使用したシンプルな Todo アプリケーションです。DDD アーキテクチャと Typescript を採用した初学者向けの学習プロジェクトです。
-
-## 技術スタック
-
-### フロントエンド
-
--   React (Next.js)
+-   Cursor 0.47.8 Pro(月額$20)
+-   .Net 9.0.201
 -   TypeScript
--   shadcn/ui (UI コンポーネント)
--   Tailwind CSS (スタイリング)
--   ESLint (コード品質)
+-   React
+-   Supabase
 
-### バックエンド
+## STEP2: DDD に関する質問をして理解を深める
 
--   C# (.NET 9)
--   ドメイン駆動設計 (DDD)
--   ASP.NET Web API
+DDD の観点で以下のような質問を実施し、回答は README に追加して後から確認できるようにしています。
 
-### データベース
+### 質問: DDD の観点で、どのようにアプリが実装されたか
 
--   Supabase (PostgreSQL)
+::: details 回答
 
-### デプロイ
+## ドメイン駆動設計（DDD）の実装
 
--   Vercel
+このアプリケーションは、ドメイン駆動設計（DDD）の原則に基づいて構築されています。以下に各レイヤーの責任と実装の詳細を示します：
 
-## 機能
-
--   Todo アイテムの作成、読み取り、更新、削除（CRUD 操作）
--   Todo アイテムの完了/未完了の切り替え
--   レスポンシブデザイン
-
-## プロジェクト構成
-
-### フロントエンド (`/frontend`)
-
-```
-
-frontend/
-├── src/
-│ ├── app/ - Next ページ
-│ ├── components/ - React コンポーネント
-│ │ ├── ui/ - shadcn/ui コンポーネント
-│ │ ├── TodoForm.tsx - Todo 追加用フォーム
-│ │ ├── TodoItem.tsx - 個々の Todo アイテム
-│ │ └── TodoList.tsx - Todo リスト
-│ └── lib/
-│ └── api-client.ts - バックエンド API 通信
-
-```
-
-### バックエンド (`/backend`)
+### プロジェクトディレクトリと DDD レイヤーの対応
 
 ```
 
 backend/
 ├── Domain/ - ドメイン層
-│ ├── Entities/ - エンティティクラス
-│ └── Repositories/ - リポジトリインターフェース
+│ ├── Entities/ - エンティティクラス (Todo.cs)
+│ └── Repositories/ - リポジトリインターフェース (ITodoRepository.cs)
 ├── Application/ - アプリケーション層
-│ ├── DTOs/ - データ転送オブジェクト
-│ └── Services/ - アプリケーションサービス
+│ ├── DTOs/ - データ転送オブジェクト (TodoDto.cs など)
+│ └── Services/ - アプリケーションサービス (TodoService.cs)
 ├── Infrastructure/ - インフラストラクチャ層
-│ └── Repositories/ - リポジトリ実装
+│ └── Repositories/ - リポジトリ実装 (SupabaseTodoRepository.cs)
 └── Presentation/ - プレゼンテーション層
-└── Controllers/ - API コントローラー
+└── Controllers/ - API コントローラー (TodosController.cs)
 
 ```
 
-## ドメイン駆動設計（DDD）の実装
+フロントエンドは主にプレゼンテーション層の役割を担い、以下のディレクトリ構成になっています：
 
-このアプリケーションは、ドメイン駆動設計（DDD）の原則に基づいて構築されています。以下に各レイヤーの責任と実装の詳細を示します：
+```
+
+frontend/src/
+├── components/ - プレゼンテーション層 (React コンポーネント)
+│ ├── TodoForm.tsx - Todo 作成フォーム
+│ ├── TodoList.tsx - Todo リスト表示
+│ └── TodoItem.tsx - 個別 Todo アイテム
+└── lib/
+└── api-client.ts - バックエンド API とのインターフェース
+
+```
+
+### レイヤー間の依存関係
+
+-   ドメイン層は他のどのレイヤーにも依存しない（内側レイヤー）
+-   アプリケーション層はドメイン層に依存する
+-   プレゼンテーション層はアプリケーション層とドメイン層に依存する
+-   インフラストラクチャ層はアプリケーション層とドメイン層に依存する（依存性逆転の原則）
 
 ### ドメイン層
 
@@ -298,44 +234,11 @@ backend/
 **対応ディレクトリ**: `backend/Infrastructure/`
 **主要ファイル**: `SupabaseTodoRepository.cs` (リポジトリ実装)
 
-### プロジェクトディレクトリと DDD レイヤーの対応
+:::
 
-```
+### 質問: CRUD の処理別に、DDD の観点でデータフロー図を作成してください
 
-backend/
-├── Domain/ - ドメイン層
-│ ├── Entities/ - エンティティクラス (Todo.cs)
-│ └── Repositories/ - リポジトリインターフェース (ITodoRepository.cs)
-├── Application/ - アプリケーション層
-│ ├── DTOs/ - データ転送オブジェクト (TodoDto.cs など)
-│ └── Services/ - アプリケーションサービス (TodoService.cs)
-├── Infrastructure/ - インフラストラクチャ層
-│ └── Repositories/ - リポジトリ実装 (SupabaseTodoRepository.cs)
-└── Presentation/ - プレゼンテーション層
-└── Controllers/ - API コントローラー (TodosController.cs)
-
-```
-
-フロントエンドは主にプレゼンテーション層の役割を担い、以下のディレクトリ構成になっています：
-
-```
-
-frontend/src/
-├── components/ - プレゼンテーション層 (React コンポーネント)
-│ ├── TodoForm.tsx - Todo 作成フォーム
-│ ├── TodoList.tsx - Todo リスト表示
-│ └── TodoItem.tsx - 個別 Todo アイテム
-└── lib/
-└── api-client.ts - バックエンド API とのインターフェース
-
-```
-
-### レイヤー間の依存関係
-
--   ドメイン層は他のどのレイヤーにも依存しない（内側レイヤー）
--   アプリケーション層はドメイン層に依存する
--   プレゼンテーション層はアプリケーション層とドメイン層に依存する
--   インフラストラクチャ層はアプリケーション層とドメイン層に依存する（依存性逆転の原則）
+::: details 回答
 
 ## DDD アーキテクチャに基づく CRUD 操作のデータフロー図
 
@@ -425,139 +328,10 @@ sequenceDiagram
     P->>P: 7. UIからアイテム削除<br/>(frontend/src/components/TodoList.tsx)
 ```
 
-## セットアップ手順
-
-### 前提条件
-
--   .NET 9 SDK
--   Node.js 16 以上
--   npm または yarn
--   Supabase アカウント
-
-### Supabase 環境の設定
-
-1. **Supabase アカウント登録**:
-
-    - [Supabase 公式サイト](https://supabase.com)でアカウントを作成
-    - 新規プロジェクト作成
-    - プロジェクト URL、API Key（anon key）をメモしておく
-
-2. **Supabase 接続情報を設定**:
-
-    - `backend/appsettings.Development.local.json`ファイルを作成（gitignore に含めること）
-
-    ```json
-    {
-        "Supabase": {
-            "Url": "your_supabase_url_here",
-            "Key": "your_supabase_anon_key_here"
-        }
-    }
-    ```
-
-3. **Supabase データベースの設定**:
-
-    - テーブルエディタで`todos`テーブルを以下のスキーマで作成：
-        - `id`: uuid 型、PRIMARY KEY、デフォルト値: `gen_random_uuid()`
-        - `title`: text 型、NOT NULL
-        - `is_completed`: boolean 型、デフォルト値: false
-        - `created_at`: timestamptz 型、デフォルト値: `now()`
-        - `user_id`: uuid 型（NULL 許容、外部キー、認証機能を実装する場合）
-
-4. **テーブルの権限設定**:
-
-    - Authentication > Policies に移動
-    - `todos`テーブルの RLS（Row Level Security）を有効にする
-    - 以下のポリシーを追加：
-
-        ```sql
-        -- すべてのユーザーに読み取り権限を付与
-        CREATE POLICY "Enable read access for all users"
-        ON "public"."todos"
-        FOR SELECT USING (true);
-
-        -- すべてのユーザーに追加権限を付与
-        CREATE POLICY "Enable insert access for all users"
-        ON "public"."todos"
-        FOR INSERT WITH CHECK (true);
-
-        -- すべてのユーザーに更新権限を付与
-        CREATE POLICY "Enable update access for all users"
-        ON "public"."todos"
-        FOR UPDATE USING (true);
-
-        -- すべてのユーザーに削除権限を付与
-        CREATE POLICY "Enable delete access for all users"
-        ON "public"."todos"
-        FOR DELETE USING (true);
-        ```
-
-### バックエンドのセットアップ
-
-1. プロジェクトルートに移動：
-
-    ```bash
-    cd backend
-    ```
-
-2. 必要なパッケージをインストール：
-
-    ```bash
-    dotnet restore
-    ```
-
-3. バックエンドを起動：
-    ```bash
-    dotnet run
-    ```
-    サーバーが http://localhost:5078 で起動します
-
-### フロントエンドのセットアップ
-
-1. フロントエンドディレクトリに移動：
-
-    ```bash
-    cd frontend
-    ```
-
-2. 必要なパッケージをインストール：
-
-    ```bash
-    npm install
-    ```
-
-3. API クライアントの設定：
-
-    - `src/lib/api-client.ts`を開き、API のベース URL がバックエンドの URL と一致することを確認：
-        ```typescript
-        const API_BASE_URL = "http://localhost:5078/api";
-        ```
-
-4. 開発サーバーを起動：
-    ```bash
-    npm run dev
-    ```
-    フロントエンドが http://localhost:3000 で起動します
-
-### 動作確認
-
-1. ブラウザで http://localhost:3000 にアクセス
-2. Todo の追加、編集、削除、完了状態の切り替えが正常に動作することを確認
-
-## 学習リソース
-
--   [C# 公式ドキュメント](https://learn.microsoft.com/ja-jp/dotnet/csharp/)
--   [ASP.NET Core ドキュメント](https://learn.microsoft.com/ja-jp/aspnet/core/)
--   [React 公式ドキュメント](https://ja.react.dev/)
--   [TypeScript 公式ドキュメント](https://www.typescriptlang.org/ja/)
--   [ドメイン駆動設計リファレンス](https://www.amazon.co.jp/dp/B00UX9VJGW/)
--   [Supabase ドキュメント](https://supabase.com/docs)
-
-## ライセンス
-
-MIT ライセンス
 :::
 
 ## まとめ
 
-とりあえず、
+DDD の理解はこれから深めていく段階ですが、学習スタイルとして、何かベースとなる書籍や一次情報等で学びつつ、AI を活用して、ぱっとアプリを作成して全体をつかみ、さらに、掘り下げた質問を AI に投げることで、理解を深めていく手法はとてもありだなと思いました。(まだ検証中。。。)
+
+Cursor 課金して本当に良かった。こんなに簡単にアプリって作れるんですね。
