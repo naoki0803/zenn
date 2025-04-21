@@ -317,10 +317,102 @@ sequenceDiagram
 
 :::
 
+### 依存関係逆転の原則を表現している場所はどこですか？
+
+::: details 回答
+
+### 依存関係逆転の原則（DIP）の実装箇所
+
+このプロジェクトでは依存関係逆転の原則が以下の箇所で明確に表現されています：
+
+1. **ドメイン層でのインターフェース定義**
+
+    - `backend/Domain/Repositories/ITodoRepository.cs` でリポジトリのインターフェースを定義
+    - このインターフェースはドメイン層（内側のレイヤー）に属している
+
+    ```csharp
+    namespace TodoApi.Domain.Repositories
+    {
+        public interface ITodoRepository
+        {
+            Task<List<Todo>> GetAllAsync();
+            Task<Todo> GetByIdAsync(Guid id);
+            Task<Guid> AddAsync(Todo todo);
+            Task<bool> UpdateAsync(Todo todo);
+            Task<bool> DeleteAsync(Guid id);
+        }
+    }
+    ```
+
+2. **インフラストラクチャ層での実装**
+
+    - `backend/Infrastructure/Repositories/SupabaseTodoRepository.cs` でインターフェースの実装を提供
+    - 低レベルのインフラ層がドメイン層（高レベル）で定義されたインターフェースに依存する形になっている
+
+    ```csharp
+    namespace TodoApi.Infrastructure.Repositories
+    {
+        public class SupabaseTodoRepository : ITodoRepository
+        {
+            private readonly Client _supabaseClient;
+
+            public SupabaseTodoRepository(Client supabaseClient)
+            {
+                _supabaseClient = supabaseClient ?? throw new ArgumentNullException(nameof(supabaseClient));
+            }
+
+            public async Task<List<Todo>> GetAllAsync()
+            {
+                // Supabaseからデータ取得の実装
+                // ...
+            }
+
+            public async Task<Todo> GetByIdAsync(Guid id)
+            {
+                // Supabaseから特定IDのデータ取得の実装
+                // ...
+            }
+
+            // 他のメソッド実装...
+        }
+    }
+    ```
+
+3. **アプリケーション層でのインターフェース利用**
+
+    - `TodoService` が具体的な実装ではなく `ITodoRepository` インターフェースを参照
+
+    ```csharp
+    private readonly ITodoRepository _todoRepository;
+
+    public TodoService(ITodoRepository todoRepository)
+    {
+        _todoRepository = todoRepository ?? throw new ArgumentNullException(nameof(todoRepository));
+    }
+    ```
+
+4. **DI コンテナでの依存関係登録**
+    - `Program.cs` でインターフェースと実装の関連付けを行っている
+    ```csharp
+    builder.Services.AddScoped<ITodoRepository, SupabaseTodoRepository>();
+    ```
+
+この設計により、ドメイン層はデータアクセスの実装詳細に依存せず、将来的にデータアクセス方法が変わっても（例：別のデータベースに変更）ドメイン層のコードに影響を与えずに対応できる柔軟性を実現しています。
+
+:::
+
 ### 質問は今後も追加予定･･･
 
 ::: details 回答
 :::
+
+## 更新履歴
+
+| 日付       | 内容                                                               |
+| ---------- | ------------------------------------------------------------------ |
+| 2024/04/21 | 質問と回答追加: 依存関係逆転の原則を表現している場所はどこですか？ |
+| 2024/04/21 | CRUD 操作の全機能実装完了                                          |
+| 2024/04/14 | 記事初版公開                                                       |
 
 ## まとめ
 
